@@ -1,5 +1,5 @@
 /**
- *  Copyright 2016 SmartThings
+ *  Copyright 2017 SmartThings
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -39,7 +39,7 @@ metadata {
 
     tiles {
         standardTile("presence", "device.presence", width: 2, height: 2, canChangeBackground: true) {
-            state "present", labelIcon:"st.presence.tile.present", backgroundColor:"#53a7c0"
+            state "present", labelIcon:"st.presence.tile.present", backgroundColor:"#00a0dc"
             state "not present", labelIcon:"st.presence.tile.not-present", backgroundColor:"#ffffff"
         }
         standardTile("beep", "device.beep", decoration: "flat") {
@@ -59,7 +59,7 @@ def updated() {
 }
 
 def configure() {
-    def cmds = zigbee.batteryConfig(20, 20, 0x01)
+    def cmds = zigbee.readAttribute(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0020) + zigbee.batteryConfig(20, 20, 0x01)
     log.debug "configure -- cmds: ${cmds}"
     return cmds
 }
@@ -151,7 +151,7 @@ private handlePresenceEvent(present) {
 
 private startTimer() {
     log.debug "Scheduling periodic timer"
-    schedule("0 * * * * ?", checkPresenceCallback)
+    runEvery1Minute("checkPresenceCallback")
 }
 
 private stopTimer() {

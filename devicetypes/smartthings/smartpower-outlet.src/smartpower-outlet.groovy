@@ -15,7 +15,7 @@
  */
 metadata {
 	// Automatically generated. Make future change here.
-	definition(name: "SmartPower Outlet", namespace: "smartthings", author: "SmartThings") {
+	definition(name: "SmartPower Outlet", namespace: "smartthings", author: "SmartThings", ocfDeviceType: "oic.d.smartplug") {
 		capability "Actuator"
 		capability "Switch"
 		capability "Power Meter"
@@ -56,9 +56,9 @@ metadata {
 	tiles(scale: 2) {
 		multiAttributeTile(name: "switch", type: "lighting", width: 6, height: 4, canChangeIcon: true) {
 			tileAttribute("device.switch", key: "PRIMARY_CONTROL") {
-				attributeState "on", label: 'On', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#79b821", nextState: "turningOff"
+				attributeState "on", label: 'On', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#00A0DC", nextState: "turningOff"
 				attributeState "off", label: 'Off', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "turningOn"
-				attributeState "turningOn", label: 'Turning On', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#79b821", nextState: "turningOff"
+				attributeState "turningOn", label: 'Turning On', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#00A0DC", nextState: "turningOff"
 				attributeState "turningOff", label: 'Turning Off', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "turningOn"
 			}
 			tileAttribute("power", key: "SECONDARY_CONTROL") {
@@ -83,9 +83,8 @@ def parse(String description) {
 
 	if (event) {
 		if (event.name == "power") {
-			event.value = event.value / 10
-			event.descriptionText = '{{ device.displayName }} power is {{ value }} Watts'
-			event.translatable = true
+			def value = (event.value as Integer) / 10
+			event = createEvent(name: event.name, value: value, descriptionText: '{{ device.displayName }} power is {{ value }} Watts', translatable: true)
 		} else if (event.name == "switch") {
 			def descriptionText = event.value == "on" ? '{{ device.displayName }} is On' : '{{ device.displayName }} is Off'
 			event = createEvent(name: event.name, value: event.value, descriptionText: descriptionText, translatable: true)
@@ -106,7 +105,7 @@ def parse(String description) {
 			log.debug "${cluster}"
 		}
 	}
-	return event
+	return event ? createEvent(event) : event
 }
 
 def off() {

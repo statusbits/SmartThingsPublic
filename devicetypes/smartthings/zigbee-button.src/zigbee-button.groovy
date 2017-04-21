@@ -28,6 +28,7 @@ metadata {
         command "enrollResponse"
 
         fingerprint inClusters: "0000, 0001, 0003, 0020, 0402, 0B05", outClusters: "0003, 0006, 0008, 0019", manufacturer: "OSRAM", model: "LIGHTIFY Dimming Switch", deviceJoinName: "OSRAM LIGHTIFY Dimming Switch"
+        fingerprint inClusters: "0000, 0001, 0003, 0020, 0402, 0B05", outClusters: "0003, 0006, 0008, 0019", manufacturer: "CentraLite", model: "3130", deviceJoinName: "Centralite Zigbee Smart Switch"
         //fingerprint inClusters: "0000, 0001, 0003, 0020, 0500", outClusters: "0003,0019", manufacturer: "CentraLite", model: "3455-L", deviceJoinName: "Iris Care Pendant"
         fingerprint inClusters: "0000, 0001, 0003, 0007, 0020, 0402, 0B05", outClusters: "0003, 0006, 0019", manufacturer: "CentraLite", model: "3460-L", deviceJoinName: "Iris Smart Button"
         fingerprint inClusters: "0000, 0001, 0003, 0007, 0020, 0B05", outClusters: "0003, 0006, 0019", manufacturer: "CentraLite", model:"3450-L", deviceJoinName: "Iris KeyFob"
@@ -44,7 +45,7 @@ metadata {
     tiles {
         standardTile("button", "device.button", width: 2, height: 2) {
             state "default", label: "", icon: "st.unknown.zwave.remote-controller", backgroundColor: "#ffffff"
-            state "button 1 pushed", label: "pushed #1", icon: "st.unknown.zwave.remote-controller", backgroundColor: "#79b821"
+            state "button 1 pushed", label: "pushed #1", icon: "st.unknown.zwave.remote-controller", backgroundColor: "#00A0DC"
         }
 
         valueTile("battery", "device.battery", decoration: "flat", inactiveLabel: false) {
@@ -251,12 +252,19 @@ def initialize() {
     if ((device.getDataValue("manufacturer") == "OSRAM") && (device.getDataValue("model") == "LIGHTIFY Dimming Switch")) {
         sendEvent(name: "numberOfButtons", value: 2)
     }
-    else if ((device.getDataValue("manufacturer") == "CentraLite") &&
-            ((device.getDataValue("model") == "3455-L") || (device.getDataValue("model") == "3460-L"))) {
-        sendEvent(name: "numberOfButtons", value: 1)
-    }
-    else if ((device.getDataValue("manufacturer") == "CentraLite") && (device.getDataValue("model") == "3450-L")) {
-        sendEvent(name: "numberOfButtons", value: 4)
+    else if (device.getDataValue("manufacturer") == "CentraLite") {
+        if (device.getDataValue("model") == "3130") {
+            sendEvent(name: "numberOfButtons", value: 2)
+        }
+        else if ((device.getDataValue("model") == "3455-L") || (device.getDataValue("model") == "3460-L")) {
+            sendEvent(name: "numberOfButtons", value: 1)
+        }
+        else if (device.getDataValue("model") == "3450-L") {
+            sendEvent(name: "numberOfButtons", value: 4)
+        }
+        else {
+            sendEvent(name: "numberOfButtons", value: 4)    //default case. can be changed later.
+        }
     }
     else {
         //default. can be changed
